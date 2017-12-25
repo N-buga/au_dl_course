@@ -55,7 +55,7 @@ def bidirectional_rnn(cell_fw, cell_bw, inputs_embedded, input_lengths,
 
 def task_specific_attention(inputs, output_size,
                             initializer=layers.xavier_initializer(),
-                            activation_fn=tf.tanh, scope=None):
+                            activation_fn=tf.tanh, attention=True, scope=None):
     """
     Performs task-specific attention reduction, using learned
     attention context vector (constant within task of interest).
@@ -87,4 +87,4 @@ def task_specific_attention(inputs, output_size,
 
         outputs = tf.reduce_sum(weighted_projection, axis=1)
 
-        return outputs
+        return outputs, attention_weights

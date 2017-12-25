@@ -16,6 +16,7 @@ class HanSequenceLabellingModel():
                  dropout_keep_proba,
                  is_training=None,
                  learning_rate=1e-4,
+                 attention=True,
                  scope=None):
         self.embedding_size = embedding_size
         self.classes = classes
@@ -26,6 +27,7 @@ class HanSequenceLabellingModel():
         self.max_grad_norm = max_grad_norm
         self.dropout_keep_proba = dropout_keep_proba
         self.is_training = is_training
+        self.attention = attention
         self.scope = scope
         self.learning_rate = learning_rate
 
@@ -82,9 +84,10 @@ class HanSequenceLabellingModel():
                     scope=scope)
 
                 with tf.variable_scope('attention') as scope:
-                    word_level_output = task_specific_attention(
+                    word_level_output, self.word_att = task_specific_attention(
                         word_encoder_output,
                         self.word_output_size,
+                        attention=self.attention,
                         scope=scope)
 
                 with tf.variable_scope('dropout'):
@@ -106,8 +109,8 @@ class HanSequenceLabellingModel():
                     self.sentence_cell, self.sentence_cell, sentence_inputs, self.sentence_lengths, scope=scope)
 
                 with tf.variable_scope('attention') as scope:
-                    sentence_level_output = task_specific_attention(
-                        sentence_encoder_output, self.sentence_output_size, scope=scope)
+                    sentence_level_output, self.sentence_att = task_specific_attention(
+                        sentence_encoder_output, self.sentence_output_size, attention=self.attention, scope=scope)
 
                 with tf.variable_scope('dropout'):
                     sentence_level_output = layers.dropout(
